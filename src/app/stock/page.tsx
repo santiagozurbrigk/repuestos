@@ -33,7 +33,7 @@ export default function StockPage() {
     if (filter !== "todos") params.set("filter", filter);
     const res = await fetch(`/api/stock?${params}`);
     const data = await res.json();
-    setProducts(data);
+    setProducts(Array.isArray(data) ? data : []);
     setLoading(false);
   }, [search, filter]);
 

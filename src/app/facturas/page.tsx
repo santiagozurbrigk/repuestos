@@ -31,7 +31,7 @@ export default function FacturasPage() {
     setLoading(true);
     const res = await fetch("/api/facturas");
     const data = await res.json();
-    setInvoices(data);
+    setInvoices(Array.isArray(data) ? data : []);
     setLoading(false);
   }
 

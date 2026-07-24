@@ -20,7 +20,7 @@ export default function PedidoPage() {
     setLoading(true);
     const res = await fetch("/api/pedido");
     const data = await res.json();
-    setItems(data);
+    setItems(Array.isArray(data) ? data : []);
     setLoading(false);
   }
 

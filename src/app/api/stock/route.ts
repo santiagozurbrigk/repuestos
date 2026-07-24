@@ -13,18 +13,20 @@ export async function GET(request: NextRequest) {
     dbQuery = dbQuery.ilike("name", `%${query}%`);
   }
 
-  if (filter === "bajo") {
-    dbQuery = dbQuery.filter("current_stock", "lte", "min_stock");
-  } else if (filter === "negativo") {
-    dbQuery = dbQuery.lt("current_stock", 0);
-  } else if (filter === "sin_registrar") {
+  if (filter === "negativo" || filter === "sin_registrar") {
     dbQuery = dbQuery.lt("current_stock", 0);
   }
 
   const { data, error } = await dbQuery;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+
+  let result = data || [];
+  if (filter === "bajo") {
+    result = result.filter((p) => p.current_stock >= 0 && p.current_stock <= p.min_stock);
+  }
+
+  return NextResponse.json(result);
 }
 
 export async function POST(request: NextRequest) {

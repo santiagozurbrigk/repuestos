@@ -45,7 +45,8 @@ export default function VentasPage() {
   const handleBarcodeInput = useCallback(
     async (code: string) => {
       const res = await fetch(`/api/productos?barcode=${encodeURIComponent(code)}`);
-      const products: ProductWithStock[] = await res.json();
+      const json = await res.json();
+      const products: ProductWithStock[] = Array.isArray(json) ? json : [];
 
       if (products.length > 0) {
         addToCart(products[0]);
@@ -92,7 +93,7 @@ export default function VentasPage() {
       setSearching(true);
       const res = await fetch(`/api/productos?q=${encodeURIComponent(search)}`);
       const data = await res.json();
-      setSearchResults(data);
+      setSearchResults(Array.isArray(data) ? data : []);
       setSearching(false);
     }, 250);
     return () => clearTimeout(timer);
