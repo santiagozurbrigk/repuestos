@@ -15,11 +15,14 @@ export async function POST(
     raw_product_name: string;
     quantity: number;
     unit_cost: number | null;
+    is_service: boolean;
     create_product?: boolean;
     product_name?: string;
   }[];
 
   for (const item of items) {
+    if (item.is_service) continue;
+
     let productId = item.product_id;
 
     if (!productId && item.create_product && item.product_name) {

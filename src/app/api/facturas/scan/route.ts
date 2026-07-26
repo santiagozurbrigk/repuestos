@@ -5,26 +5,37 @@ import Anthropic from "@anthropic-ai/sdk";
 const SCAN_PROMPT = `Analizá esta factura de proveedor de repuestos automotrices. Extraé toda la información disponible y devolvé un JSON con exactamente este formato:
 
 {
-  "supplier_name": "nombre del proveedor o null",
+  "supplier_name": "razón social del proveedor o null",
+  "invoice_number": "número de factura (ej: 00031-00001562) o null",
   "issue_date": "fecha de emisión en formato YYYY-MM-DD o null",
-  "due_date": "fecha de vencimiento en formato YYYY-MM-DD o null",
-  "total_cost": número total de la factura o null,
+  "due_date": "fecha de vencimiento más próxima en formato YYYY-MM-DD o null",
+  "subtotal": número subtotal antes de impuestos o null,
+  "total_cost": número TOTAL final de la factura (incluyendo impuestos) o null,
   "items": [
     {
-      "name": "nombre del producto",
-      "quantity": cantidad como número,
-      "unit_cost": costo unitario como número o null,
-      "barcode": "código de barras si figura en la factura o null"
+      "brand": "marca del producto (columna MARCA) o null",
+      "code": "código o referencia del producto (columna CODIGO) o null",
+      "name": "descripción del artículo (columna ARTICULO)",
+      "quantity": cantidad como número entero,
+      "unit_price": precio unitario de lista ANTES de descuentos (columna P.UNIT) como número o null,
+      "discount_pct": porcentaje de descuento DTO como número sin el símbolo % (ej: 45 para 45%) o null,
+      "bonif_pct": porcentaje de bonificación adicional BONIF como número sin el símbolo % o null,
+      "unit_cost": precio unitario final que realmente paga el comprador después de TODOS los descuentos como número o null,
+      "item_total": importe total del renglón como número o null,
+      "is_service": true si es flete, envío, transporte, cargo financiero u otro concepto que NO es un producto físico de stock; false si es un producto
     }
   ]
 }
 
 Reglas importantes:
-- Devolvé SOLO el JSON, sin texto adicional ni markdown
+- Devolvé SOLO el JSON puro, sin texto adicional, sin markdown, sin bloques de código
 - Si un campo no está disponible, usá null
 - La cantidad siempre debe ser un número entero positivo
-- Los costos son números decimales sin símbolo de moneda
-- Incluí todos los productos/items que aparecen en la factura`;
+- Todos los importes son números decimales sin símbolo de moneda ni puntos de miles
+- Para unit_cost calculá: unit_price × (1 - discount_pct/100) × (1 - bonif_pct/100)
+- Marcá is_service: true para FLETE, ENVIO, TRANSPORTE, SEGURO y cualquier servicio
+- Incluí TODOS los renglones de la factura incluidos fletes y servicios
+- Para due_date, si hay varios vencimientos usá el más próximo`;
 
 export async function POST(request: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) {
@@ -120,7 +131,9 @@ export async function POST(request: NextRequest) {
     .from("invoices")
     .insert({
       supplier_name: scannedData.supplier_name,
+      invoice_number: scannedData.invoice_number ?? null,
       total_cost: scannedData.total_cost,
+      subtotal: scannedData.subtotal ?? null,
       issue_date: scannedData.issue_date,
       due_date: scannedData.due_date,
       image_url: imageUrl,
@@ -134,12 +147,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: invoiceError.message }, { status: 500 });
   }
 
-  const invoiceItems = scannedData.items.map((item: { name: string; quantity: number; unit_cost: number | null; barcode?: string | null }) => ({
+  type ScannedItem = {
+    brand?: string | null;
+    code?: string | null;
+    name: string;
+    quantity: number;
+    unit_price?: number | null;
+    discount_pct?: number | null;
+    bonif_pct?: number | null;
+    unit_cost?: number | null;
+    item_total?: number | null;
+    is_service?: boolean;
+  };
+
+  const invoiceItems = scannedData.items.map((item: ScannedItem) => ({
     invoice_id: invoice.id,
     product_id: null,
     raw_product_name: item.name,
+    brand: item.brand ?? null,
+    product_code: item.code ?? null,
     quantity: item.quantity,
-    unit_cost: item.unit_cost,
+    unit_price: item.unit_price ?? null,
+    discount_pct: item.discount_pct ?? null,
+    bonif_pct: item.bonif_pct ?? null,
+    unit_cost: item.unit_cost ?? null,
+    item_total: item.item_total ?? null,
+    is_service: item.is_service ?? false,
   }));
 
   await supabase.from("invoice_items").insert(invoiceItems);

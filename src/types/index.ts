@@ -43,7 +43,9 @@ export interface SaleItem {
 export interface Invoice {
   id: string;
   supplier_name: string | null;
+  invoice_number: string | null;
   total_cost: number | null;
+  subtotal: number | null;
   issue_date: string | null;
   due_date: string | null;
   image_url: string | null;
@@ -58,24 +60,38 @@ export interface InvoiceItem {
   invoice_id: string;
   product_id: string | null;
   raw_product_name: string;
+  brand: string | null;
+  product_code: string | null;
   quantity: number;
+  unit_price: number | null;
+  discount_pct: number | null;
+  bonif_pct: number | null;
   unit_cost: number | null;
+  item_total: number | null;
+  is_service: boolean;
   created_at: string;
   product?: Product | null;
 }
 
 export interface ScannedInvoiceData {
   supplier_name: string | null;
+  invoice_number: string | null;
   issue_date: string | null;
   due_date: string | null;
+  subtotal: number | null;
   total_cost: number | null;
   items: {
+    brand: string | null;
+    code: string | null;
     name: string;
     quantity: number;
+    unit_price: number | null;
+    discount_pct: number | null;
+    bonif_pct: number | null;
     unit_cost: number | null;
-    barcode?: string | null;
+    item_total: number | null;
+    is_service: boolean;
   }[];
-  raw_text?: string;
 }
 
 export interface OrderItem {
