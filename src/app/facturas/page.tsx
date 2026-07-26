@@ -46,8 +46,12 @@ export default function FacturasPage() {
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      toast({ variant: "error", title: "Error al escanear", description: err.error });
+      let errMsg = "Intentá de nuevo";
+      try {
+        const err = await res.json();
+        errMsg = err.error || errMsg;
+      } catch {}
+      toast({ variant: "error", title: "Error al escanear", description: errMsg });
       setScanning(false);
       return;
     }

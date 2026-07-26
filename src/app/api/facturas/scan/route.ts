@@ -2,8 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
 const SCAN_PROMPT = `Analizá esta factura de proveedor de repuestos automotrices. Extraé toda la información disponible y devolvé un JSON con exactamente este formato:
 
 {
@@ -29,6 +27,14 @@ Reglas importantes:
 - Incluí todos los productos/items que aparecen en la factura`;
 
 export async function POST(request: NextRequest) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json(
+      { error: "ANTHROPIC_API_KEY no configurada. Agregala en Vercel → Settings → Environment Variables." },
+      { status: 503 }
+    );
+  }
+
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const supabase = await createClient();
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
 
   let scannedData;
 
+  try {
   if (isImage) {
     const mediaType = file.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
     const response = await anthropic.messages.create({
@@ -90,6 +97,10 @@ export async function POST(request: NextRequest) {
 
     const text = response.content[0].type === "text" ? response.content[0].text : "";
     scannedData = JSON.parse(text);
+  }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Error desconocido";
+    return NextResponse.json({ error: `Error al analizar la factura con IA: ${message}` }, { status: 500 });
   }
 
   let imageUrl: string | null = null;
