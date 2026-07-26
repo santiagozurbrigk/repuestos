@@ -179,6 +179,7 @@ export default function StockPage() {
                 <thead>
                   <tr className="border-b bg-gray-50">
                     <th className="text-left px-4 py-3 font-medium text-gray-600">Producto</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600">Marca</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600">Código</th>
                     <th className="text-center px-4 py-3 font-medium text-gray-600">Stock actual</th>
                     <th className="text-center px-4 py-3 font-medium text-gray-600">Stock mínimo</th>
@@ -199,7 +200,8 @@ export default function StockPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-500 font-mono text-xs">{p.barcode || "—"}</td>
+                      <td className="px-4 py-3 text-xs text-gray-600">{p.brand || "—"}</td>
+                      <td className="px-4 py-3 text-gray-400 font-mono text-xs">{p.product_code || p.barcode || "—"}</td>
                       <td className="px-4 py-3 text-center">{stockBadge(p)}</td>
                       <td className="px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
                       <td className="px-4 py-3 text-right">

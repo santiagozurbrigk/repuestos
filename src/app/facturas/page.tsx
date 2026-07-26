@@ -62,7 +62,7 @@ export default function FacturasPage() {
     setConfirmItems(
       (invoice.items || []).map((item) => ({
         ...item,
-        product_name_edit: item.raw_product_name,
+        product_name_edit: item.suggested_full_name || item.raw_product_name,
         create_new: true,
         is_service: item.is_service,
       }))
@@ -90,6 +90,8 @@ export default function FacturasPage() {
           is_service: item.is_service,
           create_product: item.create_new && !item.product_id && !item.is_service,
           product_name: item.product_name_edit,
+          brand: item.brand,
+          product_code: item.product_code,
         })),
       }),
     });
@@ -251,7 +253,7 @@ export default function FacturasPage() {
                             setConfirmItems(
                               (invoice.items || []).map((item) => ({
                                 ...item,
-                                product_name_edit: item.raw_product_name,
+                                product_name_edit: item.suggested_full_name || item.raw_product_name,
                                 create_new: true,
                                 is_service: item.is_service,
                               }))
@@ -320,16 +322,37 @@ export default function FacturasPage() {
                         )}
                       </div>
                     )}
-                    <Input
-                      value={item.product_name_edit}
-                      onChange={(e) =>
-                        setConfirmItems((prev) =>
-                          prev.map((x, j) => (j === i ? { ...x, product_name_edit: e.target.value } : x))
-                        )
-                      }
-                      className="text-sm"
-                      disabled={item.is_service}
-                    />
+                    {!item.is_service && (
+                      <p className="text-xs text-gray-400 mb-1">
+                        En factura: <span className="font-mono">{item.raw_product_name}</span>
+                      </p>
+                    )}
+                    <div className="relative">
+                      <Input
+                        value={item.product_name_edit}
+                        onChange={(e) =>
+                          setConfirmItems((prev) =>
+                            prev.map((x, j) => (j === i ? { ...x, product_name_edit: e.target.value } : x))
+                          )
+                        }
+                        className="text-sm pr-8"
+                        disabled={item.is_service}
+                        placeholder="Nombre en sistema..."
+                      />
+                      {!item.is_service && item.suggested_full_name && item.product_name_edit !== item.suggested_full_name && (
+                        <button
+                          onClick={() =>
+                            setConfirmItems((prev) =>
+                              prev.map((x, j) => (j === i ? { ...x, product_name_edit: item.suggested_full_name! } : x))
+                            )
+                          }
+                          title="Restaurar sugerencia de IA"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600"
+                        >
+                          ↩
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="w-16 shrink-0">

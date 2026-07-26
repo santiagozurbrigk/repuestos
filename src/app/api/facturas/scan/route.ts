@@ -15,7 +15,8 @@ const SCAN_PROMPT = `Analizá esta factura de proveedor de repuestos automotrice
     {
       "brand": "marca del producto (columna MARCA) o null",
       "code": "código o referencia del producto (columna CODIGO) o null",
-      "name": "descripción del artículo (columna ARTICULO)",
+      "name": "descripción del artículo tal como aparece en la factura (columna ARTICULO)",
+      "suggested_full_name": "nombre completo y descriptivo del producto para búsqueda en sistema, expandiendo abreviaturas (ej: 'BOMBA DE AGUA CHEVROLET S10' para 'B/AGUA CHEV. S10', 'FILTRO DE ACEITE VOLKSWAGEN GOL' para 'FIL/ACEITE VW. GOL'). Para servicios como flete usar null",
       "quantity": cantidad como número entero,
       "unit_price": precio unitario de lista ANTES de descuentos (columna P.UNIT) como número o null,
       "discount_pct": porcentaje de descuento DTO como número sin el símbolo % (ej: 45 para 45%) o null,
@@ -34,6 +35,7 @@ Reglas importantes:
 - Todos los importes son números decimales sin símbolo de moneda ni puntos de miles
 - Para unit_cost calculá: unit_price × (1 - discount_pct/100) × (1 - bonif_pct/100)
 - Marcá is_service: true para FLETE, ENVIO, TRANSPORTE, SEGURO y cualquier servicio
+- Para suggested_full_name: expandí abreviaturas comunes del rubro automotriz (B/AGUA=BOMBA DE AGUA, FIL=FILTRO, CHEV=CHEVROLET, VW=VOLKSWAGEN, FO=FORD, REN=RENAULT, C/POLY=CORREA POLY, TERM=TERMOSTATO, etc.)
 - Incluí TODOS los renglones de la factura incluidos fletes y servicios
 - Para due_date, si hay varios vencimientos usá el más próximo`;
 
@@ -151,6 +153,7 @@ export async function POST(request: NextRequest) {
     brand?: string | null;
     code?: string | null;
     name: string;
+    suggested_full_name?: string | null;
     quantity: number;
     unit_price?: number | null;
     discount_pct?: number | null;
@@ -164,6 +167,7 @@ export async function POST(request: NextRequest) {
     invoice_id: invoice.id,
     product_id: null,
     raw_product_name: item.name,
+    suggested_full_name: item.suggested_full_name ?? null,
     brand: item.brand ?? null,
     product_code: item.code ?? null,
     quantity: item.quantity,

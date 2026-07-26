@@ -3,6 +3,8 @@ export interface Product {
   barcode: string | null;
   name: string;
   description: string | null;
+  brand: string | null;
+  product_code: string | null;
   min_stock: number;
   created_at: string;
 }
@@ -60,6 +62,7 @@ export interface InvoiceItem {
   invoice_id: string;
   product_id: string | null;
   raw_product_name: string;
+  suggested_full_name: string | null;
   brand: string | null;
   product_code: string | null;
   quantity: number;
@@ -84,6 +87,7 @@ export interface ScannedInvoiceData {
     brand: string | null;
     code: string | null;
     name: string;
+    suggested_full_name: string | null;
     quantity: number;
     unit_price: number | null;
     discount_pct: number | null;

@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   let dbQuery = supabase.from("current_stock").select("*").order("name");
 
   if (query) {
-    dbQuery = dbQuery.ilike("name", `%${query}%`);
+    dbQuery = dbQuery.or(`name.ilike.%${query}%,brand.ilike.%${query}%,product_code.ilike.%${query}%`);
   }
 
   if (filter === "negativo" || filter === "sin_registrar") {

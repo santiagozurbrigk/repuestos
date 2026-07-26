@@ -18,6 +18,8 @@ export async function POST(
     is_service: boolean;
     create_product?: boolean;
     product_name?: string;
+    brand?: string | null;
+    product_code?: string | null;
   }[];
 
   for (const item of items) {
@@ -28,7 +30,12 @@ export async function POST(
     if (!productId && item.create_product && item.product_name) {
       const { data: newProduct } = await supabase
         .from("products")
-        .insert({ name: item.product_name, min_stock: 1 })
+        .insert({
+          name: item.product_name,
+          min_stock: 1,
+          brand: item.brand ?? null,
+          product_code: item.product_code ?? null,
+        })
         .select()
         .single();
       productId = newProduct?.id || null;
