@@ -179,10 +179,10 @@ export default function StockPage() {
                 <thead>
                   <tr className="border-b bg-gray-50">
                     <th className="text-left px-4 py-3 font-medium text-gray-600">Producto</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Marca</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">Código</th>
-                    <th className="text-center px-4 py-3 font-medium text-gray-600">Stock actual</th>
-                    <th className="text-center px-4 py-3 font-medium text-gray-600">Stock mínimo</th>
+                    <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-gray-600">Marca</th>
+                    <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-gray-600">Código</th>
+                    <th className="text-center px-4 py-3 font-medium text-gray-600">Stock</th>
+                    <th className="hidden sm:table-cell text-center px-4 py-3 font-medium text-gray-600">Mínimo</th>
                     <th className="text-right px-4 py-3 font-medium text-gray-600">Acciones</th>
                   </tr>
                 </thead>
@@ -195,15 +195,21 @@ export default function StockPage() {
                           {p.current_stock < 0 && (
                             <p className="text-xs text-red-500 flex items-center gap-1 mt-0.5">
                               <AlertTriangle className="h-3 w-3" />
-                              Stock sin registrar — ajustar
+                              Sin registrar
                             </p>
                           )}
+                          <div className="sm:hidden flex flex-wrap gap-x-2 mt-0.5">
+                            {p.brand && <span className="text-xs text-gray-500">{p.brand}</span>}
+                            {(p.product_code || p.barcode) && (
+                              <span className="text-xs text-gray-400 font-mono">{p.product_code || p.barcode}</span>
+                            )}
+                          </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-600">{p.brand || "—"}</td>
-                      <td className="px-4 py-3 text-gray-400 font-mono text-xs">{p.product_code || p.barcode || "—"}</td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-xs text-gray-600">{p.brand || "—"}</td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-gray-400 font-mono text-xs">{p.product_code || p.barcode || "—"}</td>
                       <td className="px-4 py-3 text-center">{stockBadge(p)}</td>
-                      <td className="px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
                       <td className="px-4 py-3 text-right">
                         <Button
                           size="sm"

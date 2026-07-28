@@ -16,32 +16,60 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-gray-900 text-white h-screen w-56 flex flex-col fixed left-0 top-0">
-      <div className="p-5 border-b border-gray-700">
-        <div className="flex items-center gap-2">
-          <Wrench className="h-6 w-6 text-blue-400" />
-          <span className="font-bold text-lg">Repuestos</span>
+    <>
+      {/* Desktop sidebar */}
+      <nav className="hidden md:flex bg-gray-900 text-white h-screen w-56 flex-col fixed left-0 top-0">
+        <div className="p-5 border-b border-gray-700">
+          <div className="flex items-center gap-2">
+            <Wrench className="h-6 w-6 text-blue-400" />
+            <span className="font-bold text-lg">Repuestos</span>
+          </div>
+          <p className="text-xs text-gray-400 mt-1">Sistema de stock</p>
         </div>
-        <p className="text-xs text-gray-400 mt-1">Sistema de stock</p>
-      </div>
+        <div className="flex flex-col gap-1 p-3 flex-1">
+          {navItems.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                pathname === href || pathname.startsWith(href + "/")
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </Link>
+          ))}
+        </div>
+      </nav>
 
-      <div className="flex flex-col gap-1 p-3 flex-1">
-        {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
-              pathname === href || pathname.startsWith(href + "/")
-                ? "bg-blue-600 text-white"
-                : "text-gray-400 hover:bg-gray-800 hover:text-white"
-            )}
-          >
-            <Icon className="h-5 w-5" />
-            {label}
-          </Link>
-        ))}
-      </div>
-    </nav>
+      {/* Mobile top bar */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-gray-900 text-white h-12 flex items-center px-4 gap-2">
+        <Wrench className="h-5 w-5 text-blue-400" />
+        <span className="font-bold text-sm">Repuestos</span>
+      </header>
+
+      {/* Mobile bottom tab bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-900 border-t border-gray-700 flex">
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-xs font-medium transition-colors",
+                active ? "text-blue-400" : "text-gray-500"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }

@@ -17,8 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geist.className} bg-gray-50`}>
         <ToastProvider>
           <Navbar />
-          <main className="ml-56 min-h-screen">
-            <div className="p-8">{children}</div>
+          <main className="md:ml-56 min-h-screen">
+            <div className="pt-12 md:pt-0 p-4 md:p-8 pb-20 md:pb-8">{children}</div>
           </main>
         </ToastProvider>
       </body>

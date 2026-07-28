@@ -117,7 +117,7 @@ export default function FacturasPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
           <FileText className="h-8 w-8 text-blue-600" />
           <div>
@@ -125,7 +125,7 @@ export default function FacturasPage() {
             <p className="text-sm text-gray-500">Escanear facturas de proveedores con IA</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <input
             ref={fileRef}
             type="file"
@@ -139,7 +139,7 @@ export default function FacturasPage() {
             disabled={scanning}
           >
             <Upload className="h-4 w-4 mr-2" />
-            Subir PDF / imagen
+            <span className="hidden xs:inline">Subir PDF /</span> Imagen
           </Button>
           <Button
             onClick={() => {
@@ -190,33 +190,53 @@ export default function FacturasPage() {
             invoices.map((invoice) => (
               <div key={invoice.id} className="border-b last:border-0">
                 <button
-                  className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 text-left"
+                  className="w-full flex items-center gap-4 px-4 sm:px-5 py-3 sm:py-4 hover:bg-gray-50 text-left"
                   onClick={() => setExpandedId(expandedId === invoice.id ? null : invoice.id)}
                 >
-                  <div className="flex-1 grid grid-cols-4 gap-4 items-center">
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {invoice.supplier_name || "Proveedor desconocido"}
-                      </p>
+                  <div className="flex-1 min-w-0">
+                    {/* Mobile layout */}
+                    <div className="sm:hidden">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-medium text-gray-900 truncate">
+                          {invoice.supplier_name || "Proveedor desconocido"}
+                        </p>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {statusBadge(invoice.status)}
+                          {expandedId === invoice.id
+                            ? <ChevronDown className="h-4 w-4 text-gray-400" />
+                            : <ChevronRight className="h-4 w-4 text-gray-400" />}
+                        </div>
+                      </div>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {invoice.invoice_number ? `#${invoice.invoice_number} · ` : ""}{formatDate(invoice.created_at)}
+                        {invoice.invoice_number ? `#${invoice.invoice_number} · ` : ""}
+                        {formatDate(invoice.created_at)}
+                        {invoice.total_cost ? ` · ${formatCurrency(invoice.total_cost)}` : ""}
                       </p>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {invoice.total_cost ? formatCurrency(invoice.total_cost) : "—"}
-                    </div>
-                    <div>
-                      {invoice.due_date && (
-                        <p className="text-xs text-gray-500">Vence: {formatDate(invoice.due_date)}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      {statusBadge(invoice.status)}
-                      {expandedId === invoice.id ? (
-                        <ChevronDown className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                      )}
+                    {/* Desktop layout */}
+                    <div className="hidden sm:grid grid-cols-4 gap-4 items-center">
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {invoice.supplier_name || "Proveedor desconocido"}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {invoice.invoice_number ? `#${invoice.invoice_number} · ` : ""}{formatDate(invoice.created_at)}
+                        </p>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {invoice.total_cost ? formatCurrency(invoice.total_cost) : "—"}
+                      </div>
+                      <div>
+                        {invoice.due_date && (
+                          <p className="text-xs text-gray-500">Vence: {formatDate(invoice.due_date)}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        {statusBadge(invoice.status)}
+                        {expandedId === invoice.id
+                          ? <ChevronDown className="h-4 w-4 text-gray-400" />
+                          : <ChevronRight className="h-4 w-4 text-gray-400" />}
+                      </div>
                     </div>
                   </div>
                 </button>

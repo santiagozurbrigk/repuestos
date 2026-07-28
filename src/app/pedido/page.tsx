@@ -33,7 +33,7 @@ export default function PedidoPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 print:hidden">
         <div className="flex items-center gap-3">
           <ClipboardList className="h-8 w-8 text-blue-600" />
           <div>
@@ -42,13 +42,13 @@ export default function PedidoPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-            Actualizar
+          <Button variant="outline" onClick={load} disabled={loading} size="sm">
+            <RefreshCw className={`h-4 w-4 sm:mr-2 ${loading ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Actualizar</span>
           </Button>
-          <Button variant="outline" onClick={handlePrint}>
-            <Printer className="h-4 w-4 mr-2" />
-            Imprimir
+          <Button variant="outline" onClick={handlePrint} size="sm">
+            <Printer className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Imprimir</span>
           </Button>
         </div>
       </div>
@@ -83,30 +83,32 @@ export default function PedidoPage() {
                 </p>
               </CardHeader>
               <CardContent className="p-0">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-red-50">
-                      <th className="text-left px-5 py-2.5 font-medium text-red-700">Producto</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-red-700">Stock actual</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-red-700">Mínimo</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-red-700">Pedir al menos</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {negative.map((p) => (
-                      <tr key={p.id} className="border-b last:border-0">
-                        <td className="px-5 py-3 font-medium text-gray-900">{p.name}</td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge variant="danger">{p.current_stock}</Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
-                        <td className="px-4 py-3 text-center font-semibold text-red-700">
-                          {p.min_stock - p.current_stock}
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-red-50">
+                        <th className="text-left px-4 py-2.5 font-medium text-red-700">Producto</th>
+                        <th className="text-center px-4 py-2.5 font-medium text-red-700">Stock</th>
+                        <th className="hidden sm:table-cell text-center px-4 py-2.5 font-medium text-red-700">Mínimo</th>
+                        <th className="text-center px-4 py-2.5 font-medium text-red-700">Pedir</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {negative.map((p) => (
+                        <tr key={p.id} className="border-b last:border-0">
+                          <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="danger">{p.current_stock}</Badge>
+                          </td>
+                          <td className="hidden sm:table-cell px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
+                          <td className="px-4 py-3 text-center font-semibold text-red-700">
+                            {p.min_stock - p.current_stock}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -123,30 +125,32 @@ export default function PedidoPage() {
                 </p>
               </CardHeader>
               <CardContent className="p-0">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-amber-50">
-                      <th className="text-left px-5 py-2.5 font-medium text-amber-700">Producto</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-amber-700">Stock actual</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-amber-700">Mínimo</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-amber-700">Pedir</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {low.map((p) => (
-                      <tr key={p.id} className="border-b last:border-0">
-                        <td className="px-5 py-3 font-medium text-gray-900">{p.name}</td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge variant="warning">{p.current_stock}</Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
-                        <td className="px-4 py-3 text-center font-semibold text-amber-700">
-                          {p.min_stock - p.current_stock}
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-amber-50">
+                        <th className="text-left px-4 py-2.5 font-medium text-amber-700">Producto</th>
+                        <th className="text-center px-4 py-2.5 font-medium text-amber-700">Stock</th>
+                        <th className="hidden sm:table-cell text-center px-4 py-2.5 font-medium text-amber-700">Mínimo</th>
+                        <th className="text-center px-4 py-2.5 font-medium text-amber-700">Pedir</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {low.map((p) => (
+                        <tr key={p.id} className="border-b last:border-0">
+                          <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
+                          <td className="px-4 py-3 text-center">
+                            <Badge variant="warning">{p.current_stock}</Badge>
+                          </td>
+                          <td className="hidden sm:table-cell px-4 py-3 text-center text-gray-500">{p.min_stock}</td>
+                          <td className="px-4 py-3 text-center font-semibold text-amber-700">
+                            {p.min_stock - p.current_stock}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
           )}
